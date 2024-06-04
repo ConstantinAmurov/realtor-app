@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    Int     @id @default(autoincrement())
+  email                 String  @unique
+  password              String
+  name                  String
+  phone                 String
+  type                  UserType
+  created_at            DateTime @default(now())
+  updated_at            DateTime @updatedAt
+  realtor_messages      Message[] @relation("realtor_messages")
+  buyer_messages        Message[] @relation("buyer_messages")
+}
+
+
+model Home {
+  id              Int @id @default(autoincrement())
+  address         String
+  nr_bedrooms     Int
+  nr_bathrooms    Int
+  city            String
+  price           Float
+  type            PropertyType
+  images           Image[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Image {
+  id              Int @id @default(autoincrement())
+  url             String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  home_id         Int
+  home            Home @relation(fields: [home_id], references: [id])
+}
+
+model Message {
+  id              Int @id @default(autoincrement())
+  message          String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  realtor_id Int
+  realtor          User @relation("buyer_messages",fields: [realtor_id], references: [id])
+  buyer_id Int
+  buyer            User @relation("realtor_messages",fields: [buyer_id], references: [id])
+}
+
+enum PropertyType {
+  RESIDENTIAL
+  CONDO
+}
+
+enum UserType{
+  BUYER
+  REALTOR
+  ADMIN
+}

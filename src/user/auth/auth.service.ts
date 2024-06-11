@@ -9,7 +9,7 @@ import { LoginParams, RegisterParams } from '../interfaces/auth.interfaces';
 export class AuthService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async register(params: RegisterParams) {
+  async register(params: RegisterParams, userType: UserType) {
     const userExists = await this.prismaService.user.findUnique({
       where: { email: params.email },
     });
@@ -21,18 +21,17 @@ export class AuthService {
 
     const user = await this.prismaService.user.create({
       data: {
-        ...params,
+        email: params.email,
+        name: params.name,
+        phone: params.phone,
         password: hashedPassword,
-        type: UserType.BUYER,
+        type: userType,
       },
     });
 
-    const token = this.generateJWT(user.name, user.id);
+    const accessToken = this.generateJWT(user.name, user.id);
 
-    return {
-      user,
-      token,
-    };
+    return { accessToken };
   }
 
   async login(params: LoginParams) {
@@ -51,8 +50,7 @@ export class AuthService {
       throw new HttpException('Invalid Credentials', 400);
     }
     return {
-      user,
-      token: this.generateJWT(user.name, user.id),
+      accessToken: this.generateJWT(user.name, user.id),
     };
   }
 
@@ -67,5 +65,10 @@ export class AuthService {
         expiresIn: '1d',
       },
     );
+  }
+
+  generateProductKey(email: string, userType: UserType) {
+    const string = `${email}-${userType}-${process.env.PRODUCT_KEY_SECRET}`;
+    return hash(string, 10);
   }
 }

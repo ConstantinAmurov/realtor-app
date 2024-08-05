@@ -4,12 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Query,
 } from '@nestjs/common';
 import { HomeService } from './home.service';
-import { CreateHomeDto, HomeResponseDto } from './dto/home.dto';
+import { CreateHomeDto, HomeResponseDto, UpdateHomeDto } from './dto/home.dto';
 import { PropertyType } from '@prisma/client';
 import { GetHomesFilters } from './interfaces/home.interface';
 
@@ -42,15 +43,18 @@ export class HomeController {
   }
 
   @Patch(':id')
-  updateHome(@Param('id') id: number) {
-    return Promise.resolve();
+  updateHome(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateHomeDto,
+  ) {
+    return this.homeService.updateHomeById(id, body);
   }
   @Delete(':id')
-  deleteHome(@Param('id') id: number) {
-    return Promise.resolve();
+  deleteHome(@Param('id', ParseIntPipe) id: number) {
+    return this.homeService.deleteHomeById(id);
   }
   @Post(':id')
-  inquireHome(@Param('id') id: number) {
+  inquireHome() {
     return Promise.resolve();
   }
 }

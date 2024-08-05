@@ -21,3 +21,13 @@ export interface CreateHomeParams {
   type: PropertyType;
   images?: Image[];
 }
+
+export interface UpdateHomeParams {
+  address?: string;
+  numberOfBedrooms?: number;
+  numberOfBathrooms?: number;
+  city?: string;
+  price?: number;
+  landSize?: number;
+  type?: PropertyType;
+}

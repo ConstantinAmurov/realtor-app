@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { HomeResponseDto } from './dto/home.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import {
   CreateHomeParams,
   GetHomesFilters,
@@ -78,7 +78,7 @@ export class HomeService {
     return new HomeResponseDto(home);
   }
 
-  async createHome(params: CreateHomeParams) {
+  async createHome(params: CreateHomeParams, userId: number) {
     const {
       numberOfBathrooms,
       numberOfBedrooms,
@@ -99,7 +99,7 @@ export class HomeService {
         land_size: landSize,
         type,
         price,
-        realtor_id: 1,
+        realtor_id: userId,
       },
     });
 
